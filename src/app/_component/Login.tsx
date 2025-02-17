@@ -2,15 +2,28 @@
 
 import React, { ChangeEvent, useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface LoginType {
     id: string;
     password: string;
 }
 
+interface SignUpType {
+    userId: string;
+    password: string;
+}
+
 function Login() {
+    const router = useRouter();
+
     const [loginInfo, setLoginInfo] = useState<LoginType>({
         id: "",
+        password: "",
+    });
+
+    const [sigUpInfo, setSignUpInfo] = useState<SignUpType>({
+        userId: "",
         password: "",
     });
 
@@ -22,13 +35,45 @@ function Login() {
         }));
     };
 
+    const onChangeSignUp = (e: ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = e.target;
+        setSignUpInfo((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
     const onLogin = async (): Promise<void> => {
         try {
             const res = await axios.post("/api/login", loginInfo);
-            console.log("로그인 성공:", res.data);
+
+            if (res.statusText === "OK") {
+                router.push("/home");
+            }
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 throw new Error(error.response?.data.message || "로그인 실패");
+            }
+            throw new Error("알 수 없는 오류가 발생했습니다.");
+        }
+    };
+
+    const onSignUp = async (): Promise<void> => {
+        try {
+            const res = await fetch("/api/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sigUpInfo),
+            });
+            const errorData = await res.json();
+            console.log(errorData.message);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                throw new Error(
+                    error.response?.data.message || "회원가입 실패"
+                );
             }
             throw new Error("알 수 없는 오류가 발생했습니다.");
         }
@@ -41,22 +86,61 @@ function Login() {
     return (
         <div>
             <h1>로그인 화면 입니다.</h1>
-            <p>로그인화면~</p>
-            <input
-                type="text"
-                name="id"
-                placeholder="아이디입력창"
-                value={loginInfo.id}
-                onChange={onChangeInput}
-            />
-            <input
-                type="password"
-                name="password"
-                placeholder="비밀번호 입력창"
-                value={loginInfo.password}
-                onChange={onChangeInput}
-            />
-            <button onClick={onLogin}>로긘</button>
+
+            <fieldset style={{ padding: "20px", width: "300px" }}>
+                <legend>로그인</legend>
+
+                <div>
+                    <label htmlFor="id">아이디:</label>
+                    <input
+                        type="text"
+                        id="id"
+                        name="id"
+                        placeholder="아이디입력창"
+                        value={loginInfo.id}
+                        onChange={onChangeInput}
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="password">비밀번호:</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="비밀번호 입력창"
+                        value={loginInfo.password}
+                        onChange={onChangeInput}
+                    />
+                </div>
+
+                <button onClick={onLogin}>로그인</button>
+            </fieldset>
+
+            <fieldset style={{ padding: "20px", width: "300px" }}>
+                <legend>회원가입</legend>
+                <div>
+                    <label htmlFor="userId">아이디 : </label>
+                    <input
+                        type="text"
+                        id="userId"
+                        name="userId"
+                        value={sigUpInfo.userId}
+                        onChange={onChangeSignUp}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="password">비밀번호:</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        value={sigUpInfo.password}
+                        onChange={onChangeSignUp}
+                    />
+                </div>
+                <button onClick={onSignUp}>회원가입</button>
+            </fieldset>
         </div>
     );
 }
