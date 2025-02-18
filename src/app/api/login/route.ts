@@ -2,37 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "@/constant/keys"; // 수파베이스 클라이언트 임포트
 
-type User = {
-    id: string;
-    password: string;
-};
+/*
+ * generateAccessToken과 generateRefreshToken은 순수 함수로 토큰을 생성하고
+ * 반환하는 역할만 합니다.
+ * 이 함수들 안에서 직접적으로 응답 객체(NextResponse)에
+ * 접근할 수 없기 때문에 쿠키를 설정하는 작업을 할 수 없습니다.
+ */
 
 // 비밀 키, 실제 서비스에서는 환경 변수로 관리해야 함
 // 엑세스 토큰 발급 함수
 function generateAccessToken(userId: string) {
-    const expiresIn = "15m";
-    const accessToken = jwt.sign({ userId }, ACCESS_TOKEN_SECRET, {
+    const expiresIn = "10s";
+    const token = jwt.sign({ userId }, "accessKey", {
         expiresIn,
     });
-    const expirationDate = jwt.decode(accessToken) as { exp: number };
-    const exp = expirationDate.exp * 1000 - Date.now();
+    const expirationDate = jwt.decode(token) as { exp: number };
+    const exp = expirationDate.exp * 1000; // 밀리초 단위로 변환
 
-    return { accessToken, exp };
+    return { token, exp };
 }
 
 // 리프레시 토큰 발급 함수
 function generateRefreshToken(userId: string) {
     const expiresIn = "7d";
-    const refreshToken = jwt.sign({ userId }, REFRESH_TOKEN_SECRET, {
+    const token = jwt.sign({ userId }, "refreshKey", {
         expiresIn,
     });
 
-    const expirationDate = jwt.decode(refreshToken) as { exp: number };
-    console.log(expirationDate);
-    const exp = expirationDate.exp * 1000 - Date.now();
-    return { refreshToken, exp };
+    const expirationDate = jwt.decode(token) as { exp: number };
+
+    const exp = expirationDate.exp * 1000;
+    return { token, exp };
 }
 
 export async function POST(req: NextRequest) {
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
         const accessToken = generateAccessToken(id); // 엑세스 토큰 발급
         const refreshToken = generateRefreshToken(id); // 리프레시 토큰 발급
 
-        return NextResponse.json(
+        const response = NextResponse.json(
             {
                 message: "로그인 성공",
                 accessToken, // 엑세스 토큰
@@ -86,6 +87,23 @@ export async function POST(req: NextRequest) {
             },
             { status: 200 }
         );
+
+        // 쿠키에 저장
+        response.cookies.set("accessKey", accessToken.token, {
+            httpOnly: true, // 클라이언트에서 자바스크립트로 접근 불가
+            secure: process.env.NODE_ENV === "production", // production 환경에서만 secure 쿠키 설정
+            path: "/", // 모든 경로에서 접근 가능
+            maxAge: 20 * 60, // 액세스 토큰의 유효 시간 (20분)
+        });
+
+        response.cookies.set("refreshKey", refreshToken.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60, // 리프레시 토큰의 유효 시간 (30일)
+        });
+
+        return response; // 한 번만 응답 반환
     } catch (error) {
         console.error("Unexpected Error:", error);
         return NextResponse.json(
