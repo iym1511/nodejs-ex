@@ -6,6 +6,7 @@ import { getCookies } from "@/utils/cookies";
 export async function getToken(key: string) {
     if (typeof window !== "undefined") {
         // 클라이언트 사이드
+
         return getCookies(key);
     } else {
         // 서버 사이드

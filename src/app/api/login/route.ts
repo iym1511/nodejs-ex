@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
+import { ACCESS_KEY, REFRESH_KEY } from "@/constant/keys";
+
+interface tokenType {
+    exp: number;
+    token: string;
+}
 
 /*
  * generateAccessToken과 generateRefreshToken은 순수 함수로 토큰을 생성하고
@@ -10,11 +16,10 @@ import { supabase } from "@/lib/supabase";
  * 접근할 수 없기 때문에 쿠키를 설정하는 작업을 할 수 없습니다.
  */
 
-// 비밀 키, 실제 서비스에서는 환경 변수로 관리해야 함
 // 엑세스 토큰 발급 함수
-function generateAccessToken(userId: string) {
-    const expiresIn = "10s";
-    const token = jwt.sign({ userId }, "accessKey", {
+function generateAccessToken(userId: string): tokenType {
+    const expiresIn = "10m";
+    const token = jwt.sign({ userId }, ACCESS_KEY, {
         expiresIn,
     });
     const expirationDate = jwt.decode(token) as { exp: number };
@@ -24,9 +29,9 @@ function generateAccessToken(userId: string) {
 }
 
 // 리프레시 토큰 발급 함수
-function generateRefreshToken(userId: string) {
+function generateRefreshToken(userId: string): tokenType {
     const expiresIn = "7d";
-    const token = jwt.sign({ userId }, "refreshKey", {
+    const token = jwt.sign({ userId }, REFRESH_KEY, {
         expiresIn,
     });
 
@@ -82,21 +87,21 @@ export async function POST(req: NextRequest) {
         const response = NextResponse.json(
             {
                 message: "로그인 성공",
-                accessToken, // 엑세스 토큰
-                refreshToken, // 리프레시 토큰
+                // accessToken, // 엑세스 토큰 (클라이언트에서 쿠키를 관리 할 시 사용)
+                // refreshToken, // 리프레시 토큰 (클라이언트에서 쿠키를 관리 할 시 사용)
             },
             { status: 200 }
         );
 
         // 쿠키에 저장
-        response.cookies.set("accessKey", accessToken.token, {
+        response.cookies.set(ACCESS_KEY, accessToken.token, {
             httpOnly: true, // 클라이언트에서 자바스크립트로 접근 불가
             secure: process.env.NODE_ENV === "production", // production 환경에서만 secure 쿠키 설정
             path: "/", // 모든 경로에서 접근 가능
-            maxAge: 20 * 60, // 액세스 토큰의 유효 시간 (20분)
+            maxAge: 10 * 60, // 액세스 토큰의 유효 시간 (10분)
         });
 
-        response.cookies.set("refreshKey", refreshToken.token, {
+        response.cookies.set(REFRESH_KEY, refreshToken.token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             path: "/",

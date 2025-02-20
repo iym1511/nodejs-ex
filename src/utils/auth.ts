@@ -80,8 +80,3 @@ export const signInUser = async (
         throw error;
     }
 };
-
-/* 로그아웃 */
-export const signOutUser = () => {
-    deleteCookies(STORAGE_KEY);
-};

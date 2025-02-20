@@ -1,7 +1,6 @@
 "use client";
 
 import React, { ChangeEvent, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 
 interface LoginType {
@@ -45,16 +44,25 @@ function Login() {
 
     const onLogin = async (): Promise<void> => {
         try {
-            const res = await axios.post("/api/login", loginInfo);
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(loginInfo),
+            });
 
-            if (res.statusText === "OK") {
+            if (res.ok) {
                 router.push("/home");
             }
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(error.response?.data.message || "로그인 실패");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("로그인 에러:", error.message);
+                alert(error.message);
+            } else {
+                console.error("Unexpected Error:", error);
+                alert("로그인 중 오류가 발생했습니다.");
             }
-            throw new Error("알 수 없는 오류가 발생했습니다.");
         }
     };
 
@@ -67,21 +75,17 @@ function Login() {
                 },
                 body: JSON.stringify(sigUpInfo),
             });
-            const errorData = await res.json();
-            console.log(errorData.message);
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(
-                    error.response?.data.message || "회원가입 실패"
-                );
+            /* ✅ res.ok 이 true 면 로그인 로직 실행 */
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("회원가입 에러:", error.message);
+                alert(error.message);
+            } else {
+                console.error("Unexpected Error:", error);
+                alert("회원가입 중 오류가 발생했습니다.");
             }
-            throw new Error("알 수 없는 오류가 발생했습니다.");
         }
     };
-
-    // useEffect(() => {
-    //     onLogin();
-    // }, []);
 
     return (
         <div>

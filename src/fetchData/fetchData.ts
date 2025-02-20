@@ -1,4 +1,5 @@
 import { getToken } from "@/utils/getToken";
+import { ACCESS_KEY } from "@/constant/keys";
 
 export interface boardType {
     id: number;
@@ -6,15 +7,16 @@ export interface boardType {
     created_at: string;
     content: string | null | undefined;
 }
-export const getBoard = async (): Promise<boardType[]> => {
+export const getBoard = async (): Promise<boardType[] | undefined> => {
     try {
-        const token = await getToken("accessKey");
+        const token = await getToken(ACCESS_KEY);
+
         const res = await fetch("http://localhost:3000/api/getBoard", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
-                // "Cache-Control": "no-store",
+                "Cache-Control": "no-store",
             },
         });
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { verifyToken } from "@/utils/verifyToken";
+import { ACCESS_KEY } from "@/constant/keys";
 
 export async function GET(req: Request) {
     try {
@@ -12,34 +13,34 @@ export async function GET(req: Request) {
                 { message: "No token provided" },
                 { status: 401 }
             );
-            // 쿠키 만료시키기 (과거 날짜로 설정)
-            response.cookies.set("accessKey", "", {
-                maxAge: 0,
+            // 쿠키 삭제
+            // 필요한 경우 추가 옵션 설정
+            response.cookies.set(ACCESS_KEY, "", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 path: "/",
+                maxAge: 0,
             });
             return response;
         }
 
         const token = authHeader.split(" ")[1]; // Bearer 토큰만 추출
         const decoded = verifyToken(token);
-        const response = NextResponse.json(
-            { message: "토큰이 유효하지 않거나 만료되었습니다." },
-            { status: 401 }
-        );
 
         if (!decoded) {
             // 토큰이 유효하지 않거나 만료된 경우
+            const response = NextResponse.json(
+                { message: "토큰이 유효하지 않거나 만료되었습니다." },
+                { status: 401 }
+            );
+            console.log("토큰 상태 : ", decoded);
 
-            console.log("토큰상태:", decoded);
-
-            // 쿠키 만료시키기 (과거 날짜로 설정)
-            response.cookies.set("accessKey", "", {
-                maxAge: 0,
+            // 필요한 경우 추가 옵션 설정
+            response.cookies.set(ACCESS_KEY, "", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 path: "/",
+                maxAge: 0,
             });
 
             return response;
