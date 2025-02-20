@@ -15,4 +15,6 @@ const LiveClock = memo(() => {
     return <WorkTime>{time.toLocaleTimeString()}</WorkTime>;
 });
 
+LiveClock.displayName = "LiveClock";
+
 export default LiveClock;

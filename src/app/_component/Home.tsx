@@ -47,9 +47,9 @@ function Home() {
             } else {
                 throw new Error("로그아웃 처리에 실패했습니다.");
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.log(e);
-            console.error("로그아웃 중 오류 발생:", e.message);
+            console.error("로그아웃 중 오류 발생:");
             // 오류 처리 로직 (예: 사용자에게 알림 표시 등)
         }
     };
@@ -70,11 +70,11 @@ function Home() {
                 <LeftSection>
                     <UserArticle>
                         <UserInfo>
-                            <img
-                                className="user-img"
-                                src="/assets/폼폼푸린.jpg"
-                                alt=""
-                            />
+                            {/*<img*/}
+                            {/*    className="user-img"*/}
+                            {/*    src="/assets/폼폼푸린.jpg"*/}
+                            {/*    alt=""*/}
+                            {/*/>*/}
                             <div className="user-text">
                                 <p>문일윤 사원</p>
                                 <p>개발팀</p>

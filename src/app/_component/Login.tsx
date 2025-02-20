@@ -68,7 +68,7 @@ function Login() {
 
     const onSignUp = async (): Promise<void> => {
         try {
-            const res = await fetch("/api/signup", {
+            await fetch("/api/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
