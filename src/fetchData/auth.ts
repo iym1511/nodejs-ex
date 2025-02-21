@@ -13,7 +13,7 @@ export const onSignIn = async (
         });
         const data = await res.json();
 
-        if (res) {
+        if (!res.ok) {
             const errorMessage =
                 res.status === 400
                     ? "이메일 인증 후 로그인 할 수 있습니다."
