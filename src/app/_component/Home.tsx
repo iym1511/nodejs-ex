@@ -29,8 +29,6 @@ function Home() {
 
     const consoleToken = async () => {
         const getTkn = await getToken(ACCESS_KEY);
-
-        console.log(getTkn);
     };
 
     const onLogout = async () => {

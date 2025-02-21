@@ -1,45 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
 import { ACCESS_KEY, REFRESH_KEY } from "@/constant/keys";
-
-interface tokenType {
-    exp: number;
-    token: string;
-}
-
-/*
- * generateAccessToken과 generateRefreshToken은 순수 함수로 토큰을 생성하고
- * 반환하는 역할만 합니다.
- * 이 함수들 안에서 직접적으로 응답 객체(NextResponse)에
- * 접근할 수 없기 때문에 쿠키를 설정하는 작업을 할 수 없습니다.
- */
-
-// 엑세스 토큰 발급 함수
-function generateAccessToken(userId: string): tokenType {
-    const expiresIn = "10m";
-    const token = jwt.sign({ userId }, ACCESS_KEY, {
-        expiresIn,
-    });
-    const expirationDate = jwt.decode(token) as { exp: number };
-    const exp = expirationDate.exp * 1000; // 밀리초 단위로 변환
-
-    return { token, exp };
-}
-
-// 리프레시 토큰 발급 함수
-function generateRefreshToken(userId: string): tokenType {
-    const expiresIn = "7d";
-    const token = jwt.sign({ userId }, REFRESH_KEY, {
-        expiresIn,
-    });
-
-    const expirationDate = jwt.decode(token) as { exp: number };
-
-    const exp = expirationDate.exp * 1000;
-    return { token, exp };
-}
+import {
+    generateAccessToken,
+    generateRefreshToken,
+} from "@/app/api/_auth/authTokens";
 
 export async function POST(req: NextRequest) {
     const { id, password } = await req.json(); // 요청 본문에서 JSON 데이터 받기
@@ -99,7 +65,7 @@ export async function POST(req: NextRequest) {
             httpOnly: true, // 클라이언트에서 자바스크립트로 접근 불가
             secure: process.env.NODE_ENV === "production", // production 환경에서만 secure 쿠키 설정
             path: "/", // 모든 경로에서 접근 가능
-            maxAge: 10 * 60, // 액세스 토큰의 유효 시간 (10분)
+            maxAge: 10, // 액세스 토큰의 유효 시간 (10분)
         });
 
         response.cookies.set(REFRESH_KEY, refreshToken.token, {

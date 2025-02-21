@@ -33,15 +33,14 @@ export async function GET(req: Request) {
                 { message: "토큰이 유효하지 않거나 만료되었습니다." },
                 { status: 401 }
             );
-            console.log("토큰 상태 : ", decoded);
 
             // 필요한 경우 추가 옵션 설정
-            response.cookies.set(ACCESS_KEY, "", {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                path: "/",
-                maxAge: 0,
-            });
+            // response.cookies.set(ACCESS_KEY, "", {
+            //     httpOnly: true,
+            //     secure: process.env.NODE_ENV === "production",
+            //     path: "/",
+            //     maxAge: 0,
+            // });
 
             return response;
         }

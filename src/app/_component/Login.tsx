@@ -21,7 +21,7 @@ function Login() {
         errorMsg: state.errorMsg,
         setErrMsg: state.setErrMsg,
     }));
-    console.log(errorMsg);
+
     const [loginInfo, setLoginInfo] = useState<LoginType>({
         id: "",
         password: "",

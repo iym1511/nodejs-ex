@@ -4,47 +4,47 @@
 // import { deleteCookies, setCookies } from "@/utils/cookies";
 // import { STORAGE_KEY } from "@supabase/auth-js/src/lib/constants";
 //
-// export function jwtDecode(token: string): UserType | null {
-//     try {
-//         if (!token) return null;
-//
-//         const parts: string[] = token.split(".");
-//
-//         if (parts.length < 2) {
-//             throw new Error("Invalid token!");
-//         }
-//
-//         const base64Url: string = parts[1];
-//         const base64: string = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-//         const decoded: UserType = JSON.parse(atob(base64)); // 복호화 한 것을 문자열 -> 객체로 변환
-//
-//         return decoded; // 복호화된 유저정보 반환
-//     } catch (error) {
-//         console.error("Error decoding token:", error);
-//         throw error;
-//     }
-// }
+export function jwtDecode(token: string): any | null {
+    try {
+        if (!token) return null;
+
+        const parts: string[] = token.split(".");
+
+        if (parts.length < 2) {
+            throw new Error("Invalid token!");
+        }
+
+        const base64Url: string = parts[1];
+        const base64: string = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const decoded: any = JSON.parse(atob(base64)); // 복호화 한 것을 문자열 -> 객체로 변환
+
+        return decoded; // 복호화된 유저정보 반환
+    } catch (error) {
+        console.error("Error decoding token:", error);
+        throw error;
+    }
+}
 //
 // /* 토큰 만료 계산 */
-// export function isValidToken(
-//     accessToken: string
-// ): "valid" | "expired" | "invalid" {
-//     if (!accessToken) {
-//         return "invalid";
-//     }
-//     try {
-//         const decoded = jwtDecode(accessToken);
-//
-//         if (!decoded || typeof decoded.exp !== "number") {
-//             return "invalid";
-//         }
-//         const currentTime: number = Date.now() / 1000;
-//         return decoded.exp > currentTime ? "valid" : "expired";
-//     } catch (error) {
-//         console.error("Error during token validation:", error);
-//         return "invalid";
-//     }
-// }
+export function isValidToken(
+    accessToken: string
+): "valid" | "expired" | "invalid" {
+    if (!accessToken) {
+        return "invalid";
+    }
+    try {
+        const decoded = jwtDecode(accessToken);
+
+        if (!decoded || typeof decoded.exp !== "number") {
+            return "invalid";
+        }
+        const currentTime: number = Date.now() / 1000;
+        return decoded.exp > currentTime ? "valid" : "expired";
+    } catch (error) {
+        console.error("Error during token validation:", error);
+        return "invalid";
+    }
+}
 //
 // async function setSession(accessToken: string): Promise<boolean> {
 //     try {
