@@ -2,8 +2,10 @@
 
 import React, { ChangeEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { onSignIn } from "@/fetchData/auth";
+import { useErrMsg } from "@/store/useErrMsg";
 
-interface LoginType {
+export interface LoginType {
     id: string;
     password: string;
 }
@@ -15,7 +17,11 @@ interface SignUpType {
 
 function Login() {
     const router = useRouter();
-
+    const { errorMsg, setErrMsg } = useErrMsg((state) => ({
+        errorMsg: state.errorMsg,
+        setErrMsg: state.setErrMsg,
+    }));
+    console.log(errorMsg);
     const [loginInfo, setLoginInfo] = useState<LoginType>({
         id: "",
         password: "",
@@ -44,21 +50,14 @@ function Login() {
 
     const onLogin = async (): Promise<void> => {
         try {
-            const res = await fetch("/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(loginInfo),
-            });
+            const res = await onSignIn(loginInfo);
 
-            if (res.ok) {
+            if (res?.status) {
                 router.push("/home");
             }
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error("로그인 에러:", error.message);
-                alert(error.message);
+                setErrMsg(error.message);
             } else {
                 console.error("Unexpected Error:", error);
                 alert("로그인 중 오류가 발생했습니다.");

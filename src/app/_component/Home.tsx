@@ -14,7 +14,7 @@ import {
     WorkBtn,
     WorkTimeBox,
 } from "@/styles/home";
-import LiveClock from "@/app/home/_component/LiveCLock";
+import LiveClock from "@/app/home/_component/LiveClock";
 import { getToken } from "@/utils/getToken";
 
 function Home() {

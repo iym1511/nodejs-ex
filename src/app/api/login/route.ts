@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
         const response = NextResponse.json(
             {
                 message: "로그인 성공",
+                id: id,
                 // accessToken, // 엑세스 토큰 (클라이언트에서 쿠키를 관리 할 시 사용)
                 // refreshToken, // 리프레시 토큰 (클라이언트에서 쿠키를 관리 할 시 사용)
             },

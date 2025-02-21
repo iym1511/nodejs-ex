@@ -1,7 +1,7 @@
-import { memo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { WorkTime } from "@/styles/home";
 
-const LiveClock = memo(() => {
+const LiveClock = () => {
     const [time, setTime] = useState(new Date());
 
     useEffect(() => {
@@ -13,8 +13,6 @@ const LiveClock = memo(() => {
     }, []);
 
     return <WorkTime>{time.toLocaleTimeString()}</WorkTime>;
-});
-
-LiveClock.displayName = "LiveClock";
+};
 
 export default LiveClock;

@@ -1,5 +1,5 @@
 import { getToken } from "@/utils/getToken";
-import { ACCESS_KEY } from "@/constant/keys";
+import { ACCESS_KEY, API_URL } from "@/constant/keys";
 
 export interface boardType {
     id: number;
@@ -11,10 +11,10 @@ export const getBoard = async (): Promise<boardType[] | undefined> => {
     try {
         const token = await getToken(ACCESS_KEY);
 
-        const res = await fetch("http://localhost:3000/api/getBoard", {
+        // getBoard는 서버에서 실행될 가능성이 있어 절대 경로 가 필요함
+        const res = await fetch(`${API_URL}/api/getBoard`, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
                 "Cache-Control": "no-store",
             },
