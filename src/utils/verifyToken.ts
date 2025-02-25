@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
-import { ACCESS_TOKEN_SECRET } from "@/constant/keys";
 
-export const verifyToken = (token: string) => {
+export const verifyToken = (token: string, secretKey: string) => {
     try {
-        const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+        const decoded = jwt.verify(token, secretKey);
         return { success: true, decoded }; // 유효한 토큰이면 디코딩된 정보 반환
     } catch (err: unknown) {
         return {

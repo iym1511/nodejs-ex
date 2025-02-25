@@ -19,7 +19,6 @@ export const getBoard = async (): Promise<boardType[] | undefined> => {
                 "Cache-Control": "no-store",
             },
         });
-
         const data = await res.json();
 
         // data가 배열인지 확인 후 반환

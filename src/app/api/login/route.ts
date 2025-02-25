@@ -6,6 +6,10 @@ import {
     generateAccessToken,
     generateRefreshToken,
 } from "@/app/api/_auth/authTokens";
+import {
+    ACCESS_TOKEN_COOKIE_OPTIONS,
+    REFRESH_TOKEN_COOKIE_OPTIONS,
+} from "@/app/api/_auth/cookieOption";
 
 export async function POST(req: NextRequest) {
     const { id, password } = await req.json(); // 요청 본문에서 JSON 데이터 받기
@@ -61,19 +65,17 @@ export async function POST(req: NextRequest) {
         );
 
         // 쿠키에 저장
-        response.cookies.set(ACCESS_KEY, accessToken.token, {
-            httpOnly: true, // 클라이언트에서 자바스크립트로 접근 불가
-            secure: process.env.NODE_ENV === "production", // production 환경에서만 secure 쿠키 설정
-            path: "/", // 모든 경로에서 접근 가능
-            maxAge: 10, // 액세스 토큰의 유효 시간 (10분)
-        });
+        response.cookies.set(
+            ACCESS_KEY,
+            accessToken.token,
+            ACCESS_TOKEN_COOKIE_OPTIONS
+        );
 
-        response.cookies.set(REFRESH_KEY, refreshToken.token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: 30 * 24 * 60 * 60, // 리프레시 토큰의 유효 시간 (30일)
-        });
+        response.cookies.set(
+            REFRESH_KEY,
+            refreshToken.token,
+            REFRESH_TOKEN_COOKIE_OPTIONS
+        );
 
         return response; // 한 번만 응답 반환
     } catch (error) {

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { verifyToken } from "@/utils/verifyToken";
-import { ACCESS_KEY } from "@/constant/keys";
+import { ACCESS_KEY, ACCESS_TOKEN_SECRET } from "@/constant/keys";
+import { DELETE_COOKIE_OPTIONS } from "@/app/api/_auth/cookieOption";
 
 export async function GET(req: Request) {
     try {
@@ -15,17 +16,12 @@ export async function GET(req: Request) {
             );
             // 쿠키 삭제
             // 필요한 경우 추가 옵션 설정
-            response.cookies.set(ACCESS_KEY, "", {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                path: "/",
-                maxAge: 0,
-            });
+            response.cookies.set(ACCESS_KEY, "", DELETE_COOKIE_OPTIONS);
             return response;
         }
 
         const token = authHeader.split(" ")[1]; // Bearer 토큰만 추출
-        const decoded = verifyToken(token);
+        const decoded = verifyToken(token, ACCESS_TOKEN_SECRET);
 
         if (!decoded) {
             // 토큰이 유효하지 않거나 만료된 경우

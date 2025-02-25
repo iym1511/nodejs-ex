@@ -1,13 +1,6 @@
 import { NextResponse } from "next/server";
-import { ACCESS_KEY } from "@/constant/keys";
-
-const COOKIE_OPTIONS = {
-    httpOnly: true, // 클라이언트에서 자바스크립트로 접근 불가
-    secure: process.env.NODE_ENV === "production", // production 환경에서만 secure 쿠키 설정
-    path: "/", // 모든 경로에서 접근 가능
-    maxAge: 0, // 쿠키 만료 시간 (0으로 설정하면 삭제됨)
-    expires: new Date(0), // 쿠키의 만료 시간을 1970년 1월 1일로 설정하여 삭제
-};
+import { ACCESS_KEY, REFRESH_KEY } from "@/constant/keys";
+import { DELETE_COOKIE_OPTIONS } from "@/app/api/_auth/cookieOption";
 
 export async function POST() {
     try {
@@ -20,7 +13,8 @@ export async function POST() {
         );
 
         // 쿠키 삭제
-        response.cookies.set(ACCESS_KEY, "", COOKIE_OPTIONS);
+        response.cookies.set(REFRESH_KEY, "", DELETE_COOKIE_OPTIONS);
+        response.cookies.set(ACCESS_KEY, "", DELETE_COOKIE_OPTIONS);
 
         return response; // 한 번만 응답 반환
     } catch (error) {
