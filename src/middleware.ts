@@ -51,7 +51,6 @@ export async function middleware(request: NextRequest) {
                         "Content-Type": "application/json",
                         Cookie: `refreshToken=${refreshToken}`,
                     },
-                    credentials: "include", // 서버에서 쿠키 받을 수 있게함
                 });
                 const data = await res.json();
 
