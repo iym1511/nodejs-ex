@@ -10,7 +10,6 @@ interface DeleteTokenType {
     secure: boolean;
     path: string;
     maxAge: number;
-    // domain: string;
 }
 
 export const REFRESH_TOKEN_COOKIE_OPTIONS: SetTokenType = {
@@ -24,7 +23,7 @@ export const ACCESS_TOKEN_COOKIE_OPTIONS: SetTokenType = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 10,
+    maxAge: 10, // 10초
 };
 
 export const DELETE_COOKIE_OPTIONS: DeleteTokenType = {

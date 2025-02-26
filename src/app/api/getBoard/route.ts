@@ -8,6 +8,7 @@ export async function GET(req: Request) {
     try {
         // Authorization 헤더에서 Bearer 토큰 가져오기
         const authHeader = req.headers.get("Authorization");
+        console.log(authHeader);
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             // Authorization 헤더가 없거나 Bearer 타입이 아닌 경우
             const response = NextResponse.json(
@@ -25,20 +26,10 @@ export async function GET(req: Request) {
 
         if (!decoded) {
             // 토큰이 유효하지 않거나 만료된 경우
-            const response = NextResponse.json(
+            return NextResponse.json(
                 { message: "토큰이 유효하지 않거나 만료되었습니다." },
                 { status: 401 }
             );
-
-            // 필요한 경우 추가 옵션 설정
-            // response.cookies.set(ACCESS_KEY, "", {
-            //     httpOnly: true,
-            //     secure: process.env.NODE_ENV === "production",
-            //     path: "/",
-            //     maxAge: 0,
-            // });
-
-            return response;
         }
 
         // 요청 데이터 받기

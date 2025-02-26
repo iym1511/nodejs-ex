@@ -1,14 +1,22 @@
-import jwt from "jsonwebtoken";
+import { type JwtPayload, verify } from "jsonwebtoken";
 
-export const verifyToken = (token: string, secretKey: string) => {
+interface VerifyTokenResult {
+    success: boolean;
+    decoded?: JwtPayload & { userId: string };
+    error?: string;
+}
+
+/*  JWT(Json Web Token) 검증 함수 */
+export function verifyToken(token: string, secret: string): VerifyTokenResult {
     try {
-        const decoded = jwt.verify(token, secretKey);
-        return { success: true, decoded }; // 유효한 토큰이면 디코딩된 정보 반환
-    } catch (err: unknown) {
+        const decoded = verify(token, secret) as JwtPayload & {
+            userId: string;
+        };
+        return { success: true, decoded };
+    } catch (error) {
         return {
             success: false,
-            message: "토큰 검증 실패",
-            error: err,
-        }; // 검증 실패 시 메시지 반환
+            error: error instanceof Error ? error.message : "Unknown error",
+        };
     }
-};
+}

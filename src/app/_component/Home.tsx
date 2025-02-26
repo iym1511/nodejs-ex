@@ -37,7 +37,7 @@ function Home() {
             const response = await fetch("/api/logout", {
                 method: "POST",
             });
-            console.log(response);
+
             // 로그아웃 요청이 성공한 후 쿠키 삭제
             if (response.ok) {
                 // 로그인 페이지로 이동
