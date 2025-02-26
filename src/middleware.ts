@@ -35,15 +35,12 @@ export async function middleware(request: NextRequest) {
             !accessToken
         ) {
             // 리프레시 토큰, 엑세스토큰 없을 때
+            console.log("asdasdasdasdads");
             return NextResponse.redirect(new URL("/login", request.url));
         }
 
-        if (
-            !accessToken ||
-            excludeCheck.includes(validAccess) ||
-            !refreshToken
-        ) {
-            // 엑세스 토큰없거나, 리프레시 토큰 만료되었을 때
+        if (!accessToken || excludeCheck.includes(validAccess)) {
+            // 엑세스 토큰없거나, 엑세스 토큰이 만료되었을 때
             try {
                 const res = await fetch(`${API_URL}/api/refresh`, {
                     method: "POST",
