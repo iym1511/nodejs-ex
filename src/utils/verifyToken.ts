@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (token: string, secretKey: string) => {
+    console.log(token, secretKey);
     try {
         const decoded = jwt.verify(token, secretKey);
         return { success: true, decoded }; // 유효한 토큰이면 디코딩된 정보 반환

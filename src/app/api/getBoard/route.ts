@@ -1,45 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { verifyToken } from "@/utils/verifyToken";
-import { ACCESS_KEY, ACCESS_TOKEN_SECRET } from "@/constant/keys";
-import { DELETE_COOKIE_OPTIONS } from "@/app/api/_auth/cookieOption";
+import { verifyAccessToken } from "@/utils/verifyAccessToken";
 
 export async function GET(req: Request) {
     try {
-        // Authorization 헤더에서 Bearer 토큰 가져오기
-        const authHeader = req.headers.get("Authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            // Authorization 헤더가 없거나 Bearer 타입이 아닌 경우
-            const response = NextResponse.json(
-                { message: "No token provided" },
-                { status: 401 }
-            );
-            // 쿠키 삭제
-            // 필요한 경우 추가 옵션 설정
-            response.cookies.set(ACCESS_KEY, "", DELETE_COOKIE_OPTIONS);
-            return response;
-        }
-
-        const token = authHeader.split(" ")[1]; // Bearer 토큰만 추출
-        const decoded = verifyToken(token, ACCESS_TOKEN_SECRET);
-
-        if (!decoded) {
-            // 토큰이 유효하지 않거나 만료된 경우
-            const response = NextResponse.json(
-                { message: "토큰이 유효하지 않거나 만료되었습니다." },
-                { status: 401 }
-            );
-
-            // 필요한 경우 추가 옵션 설정
-            // response.cookies.set(ACCESS_KEY, "", {
-            //     httpOnly: true,
-            //     secure: process.env.NODE_ENV === "production",
-            //     path: "/",
-            //     maxAge: 0,
-            // });
-
-            return response;
-        }
+        // 액세스토큰 검증
+        const verifyResult = verifyAccessToken(req);
+        console.log(verifyResult);
 
         // 요청 데이터 받기
         const { data, error } = await supabase.from("board").select("*");

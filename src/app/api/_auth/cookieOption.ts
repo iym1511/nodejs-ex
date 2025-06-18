@@ -32,7 +32,6 @@ export const DELETE_COOKIE_OPTIONS: DeleteTokenType = {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 0,
-
     // domain: API_URL,
 };
 

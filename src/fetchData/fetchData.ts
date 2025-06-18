@@ -10,6 +10,7 @@ export interface boardType {
 export const getBoard = async (): Promise<boardType[] | undefined> => {
     try {
         const token = await getToken(ACCESS_KEY);
+        console.log(token);
 
         // getBoard는 서버에서 실행될 가능성이 있어 절대 경로 가 필요함
         const res = await fetch(`${API_URL}/api/getBoard`, {
@@ -30,6 +31,24 @@ export const getBoard = async (): Promise<boardType[] | undefined> => {
         } else {
             // 만약 예상치 못한 에러가 발생했다면, 기본 에러 처리
             console.error("Unknown error:", e);
+        }
+    }
+};
+
+export const getReToken = async (refreshToken: string): Promise<any> => {
+    try {
+        const res = await fetch(`/api/refresh`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                cookie: `refreshToken=${refreshToken}`, // ✅ 올바른 쿠키 형식
+            },
+        });
+
+        return res;
+    } catch (e: unknown) {
+        if (e instanceof Error) {
+            console.error(e.message);
         }
     }
 };

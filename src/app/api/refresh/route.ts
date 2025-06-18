@@ -4,7 +4,12 @@ import {
     generateRefreshToken,
 } from "@/app/api/_auth/authTokens";
 import { verifyToken } from "@/utils/verifyToken";
-import { ACCESS_KEY, REFRESH_KEY, REFRESH_TOKEN_SECRET } from "@/constant/keys";
+import {
+    ACCESS_KEY,
+    ACCESS_TOKEN_SECRET,
+    REFRESH_KEY,
+    REFRESH_TOKEN_SECRET,
+} from "@/constant/keys";
 import {
     ACCESS_TOKEN_COOKIE_OPTIONS,
     REFRESH_TOKEN_COOKIE_OPTIONS,
@@ -15,9 +20,11 @@ export async function POST(req: NextRequest) {
         // const responseCookies = new ResponseCookies(req.headers);
 
         const cookies = req.headers.get("cookie") || "";
+
         const getTokens = cookies.split("=");
-        const getRefreshToken = getTokens[1];
-        // console.log(cookies);
+        const getRefreshToken = getTokens[1]; // 분리한 refreshToken
+        const tokenDecoded = verifyToken(getRefreshToken, REFRESH_TOKEN_SECRET);
+
         // 만약 refreshToken이 없다면 에러 처리
         if (!getRefreshToken) {
             return NextResponse.json(
@@ -28,6 +35,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // 토큰 만료 검증
         const verifyRefreshTkn = verifyToken(
             getRefreshToken,
             REFRESH_TOKEN_SECRET
@@ -35,8 +43,12 @@ export async function POST(req: NextRequest) {
 
         // 3️⃣ **JWT 발급**
         if (verifyRefreshTkn.success) {
-            const accessToken = generateAccessToken(getRefreshToken); // 엑세스 토큰 발급
-            const refreshToken = generateRefreshToken(getRefreshToken); // 리프레시 토큰 발급
+            const accessToken = generateAccessToken(
+                tokenDecoded?.decoded?.userId
+            ); // 엑세스 토큰 발급
+            const refreshToken = generateRefreshToken(
+                tokenDecoded?.decoded?.userId
+            ); // 리프레시 토큰 발급
 
             // 토큰 응답
             const response = NextResponse.json(
@@ -47,11 +59,13 @@ export async function POST(req: NextRequest) {
                 },
                 { status: 200 }
             );
+
             response.cookies.set(
                 ACCESS_KEY,
                 accessToken.token,
                 ACCESS_TOKEN_COOKIE_OPTIONS
             );
+
             response.cookies.set(
                 REFRESH_KEY,
                 refreshToken.token,
