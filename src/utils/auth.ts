@@ -3,8 +3,14 @@
 //
 // import { deleteCookies, setCookies } from "@/utils/cookies";
 // import { STORAGE_KEY } from "@supabase/auth-js/src/lib/constants";
-//
-export function jwtDecode(token: string): any | null {
+
+interface JwtType {
+    userId: string;
+    iat: number;
+    exp: number;
+}
+
+export function jwtDecode(token: string): JwtType | null {
     try {
         if (!token) return null;
 
@@ -17,8 +23,7 @@ export function jwtDecode(token: string): any | null {
         const base64Url: string = parts[1];
         const base64: string = base64Url.replace(/-/g, "+").replace(/_/g, "/");
 
-        const decoded: any = JSON.parse(atob(base64)); // 복호화 한 것을 문자열 -> 객체로 변환
-        return decoded; // 복호화된 유저정보 반환
+        return JSON.parse(atob(base64)); // 복호화 한 것을 문자열 -> 객체로 변환 / 복호화된 유저정보 반환
     } catch (error) {
         console.error("Error decoding token:", error);
         throw error;

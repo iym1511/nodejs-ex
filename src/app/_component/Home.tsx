@@ -2,7 +2,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { boardType, getBoard } from "@/fetchData/fetchData";
-import { ACCESS_KEY } from "@/constant/keys";
 import { useRouter } from "next/navigation";
 import {
     Container,
@@ -15,7 +14,6 @@ import {
     WorkTimeBox,
 } from "@/styles/home";
 import LiveClock from "@/app/home/_component/LiveClock";
-import { getToken } from "@/utils/getToken";
 
 function Home() {
     const router = useRouter();
@@ -27,17 +25,13 @@ function Home() {
         gcTime: 300 * 1000, // 5분뒤 메모리 정리
     });
 
-    const consoleToken = async () => {
-        const getTkn = await getToken(ACCESS_KEY);
-    };
-
     const onLogout = async () => {
         try {
             // 로그아웃 요청
             const response = await fetch("/api/logout", {
                 method: "POST",
             });
-            console.log(response);
+
             // 로그아웃 요청이 성공한 후 쿠키 삭제
             if (response.ok) {
                 // 로그인 페이지로 이동
@@ -56,7 +50,6 @@ function Home() {
         <div>
             <h1>홈 화면 입니다.</h1>
             <p>HOME 화면~</p>
-            <button onClick={consoleToken}>토큰확인</button>
             <button onClick={onLogout}>로그아웃</button>
             {data?.map((a, index) => (
                 <div key={index} style={{ border: "1px solid white" }}>

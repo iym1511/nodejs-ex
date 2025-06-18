@@ -17,8 +17,7 @@ interface SignUpType {
 
 function Login() {
     const router = useRouter();
-    const { errorMsg, setErrMsg } = useErrMsg((state) => ({
-        errorMsg: state.errorMsg,
+    const { setErrMsg } = useErrMsg((state) => ({
         setErrMsg: state.setErrMsg,
     }));
 
